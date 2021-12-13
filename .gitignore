@@ -1,2 +1,6 @@
 project_description
 .idea
+
+# Added by cargo
+
+/target
