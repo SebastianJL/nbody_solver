@@ -67,24 +67,32 @@ if __name__ == '__main__':
     # Read data.
     header = 'ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential'.split(', ')
     data = pd.read_csv('data/data.txt', delimiter='\t', header=None, names=header, index_col='ID')
-    print(f'{data.isna().any().any() = }')
+    print(f'{data.isna().any().any() = }\n')
 
     # Bin radius.
     r = data[['x', 'y', 'z']].apply(np.square).sum(axis=1).apply(np.sqrt)
-    print(f'{r.describe() = }')
-    n_bins = 50
+    print(f'{r.describe() = }\n')
+    n_bins = 70
     bin_edges = log_bins(r.min(), r.max() + 1, n_bins)  # Make upper limit a little bigger to include last particle.
     hist, bin_edges = np.histogram(r, bins=bin_edges)
 
     # Fit histogram data to Hernquist distribution.
     N = np.sum(hist)
     func = partial(residual, N)
-    xdata = bin_edges  # (bin_edges[:-1] + bin_edges[1:]) / 2
+    xdata = bin_edges
     ydata = hist
     sigma = np.sqrt(ydata) + 1
-    a0 = [1e-1]
+    p0 = [0.08]
     bounds = ([0], [np.inf])
-    popt, pcov = curve_fit(func, xdata, ydata, a0, sigma, bounds=bounds)
+    popt, pcov = curve_fit(func, xdata, ydata, p0, sigma, bounds=bounds)
+    a_opt = popt[0]
+    a_err = np.sqrt(pcov[0, 0])
+    a_rerr = a_err / a_opt
+    chi2 = np.sum(np.square((func(xdata, a_opt) - ydata) / sigma)) / (len(xdata) - len(p0))
+    print(f'{a_opt = : .4}')
+    print(f'{a_err = : .4}')
+    print(f'{a_rerr = : .1%}')
+    print(f'{chi2 = : .2}')
 
     # Plot.
     fig, ax = plt.subplots()
@@ -92,7 +100,7 @@ if __name__ == '__main__':
     widths = bin_edges[1:] - bin_edges[:-1]
     ax.bar(midpoints, hist, widths, yerr=np.sqrt(hist), color='orange', capsize=3, label=f'binned data, {n_bins = }')
     ax.plot(midpoints, func(bin_edges, popt), color='blue', label='least-squares fit')
-    ax.set_title(f"Hernquist particle distribution\n {N = }, a_opt = {popt[0]:.3g}, a_err = {pcov[0,0]**2: .3g}")
+    ax.set_title(f"Hernquist particle distribution\n {N = }, {a_opt = :.3g}, {a_rerr = : .1%}, {chi2 = : .1f}")
     ax.set_xlabel('r')
     ax.set_ylabel('# particles')
     ax.set_xscale('log')
