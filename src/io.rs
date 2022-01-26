@@ -1,4 +1,6 @@
-use crate::Particle;
+use crate::{Particle, Vector3D};
+use byteorder::{LittleEndian, WriteBytesExt};
+use std::fs::File;
 use std::path::Path;
 
 pub fn read_csv_file(p: &Path) -> csv::Result<Vec<Particle>> {
@@ -12,4 +14,14 @@ pub fn read_csv_file(p: &Path) -> csv::Result<Vec<Particle>> {
         particles.push(p)
     }
     Ok(particles)
+}
+
+pub fn write_accelerations(path: &Path, vecs: &Vec<Vector3D>) -> std::io::Result<()> {
+    let mut file = File::create(path)?;
+    for a in vecs.iter() {
+        file.write_f64::<LittleEndian>(a.0 as f64)?;
+        file.write_f64::<LittleEndian>(a.1 as f64)?;
+        file.write_f64::<LittleEndian>(a.2 as f64)?;
+    }
+    Ok(())
 }
