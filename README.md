@@ -16,4 +16,4 @@
     Vz[i]
     softening[i]
     potential[i]
-
+- The positions are given relative to the galaxies center.
