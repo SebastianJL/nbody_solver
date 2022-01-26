@@ -1,31 +1,37 @@
+use crate::io::write_accelerations;
 use csv;
 use csv::Writer;
 use particle::Particle;
 use std::path::Path;
+use vector3d::Vector3D;
 
 mod io;
 mod particle;
+mod vector3d;
 
 type Real = f32;
 
-fn calculate_forces(particles: &Vec<Particle>) -> () {
-    let N = particles.len();
-
-    for (i, p1) in particles.iter().enumerate() {
-        let mut forces: Vec<Real> = vec![];
+fn calculate_accelerations(particles: &mut Vec<Particle>) -> Vec<Vector3D> {
+    let n = particles.len();
+    let mut accs = vec![Vector3D(0., 0., 0.); n];
+    for (i, (p1, acc)) in particles.iter().zip(accs.iter_mut()).enumerate() {
         for (j, p2) in particles.iter().enumerate() {
-            if i < j {
-                let f = p1.force(p2);
-                forces.push(f);
-                // println!("({:?}, {:?}): {:?}", i, j, p1.force(p2));
+            if i != j {
+                let a = p1.acc(p2, p1.eps);
+                acc.0 += a.0;
+                acc.1 += a.1;
+                acc.2 += a.2;
             }
         }
     }
+    accs
 }
 
 fn main() {
-    let path = Path::new("data/data.txt");
-    let particles = io::read_csv_file(path).expect("Error reading file.");
+    let in_file = Path::new("data/data.txt");
+    let out_file = Path::new("output/accelerations.dat");
+    let mut particles = io::read_csv_file(in_file).expect("Error reading file.");
     println! {"{:?}", particles[0]};
-    // calculate_forces(&particles);
+    let accs = calculate_accelerations(&mut particles);
+    write_accelerations(out_file, &accs).expect("Error writing file.");
 }
