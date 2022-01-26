@@ -5,20 +5,20 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct Particle {
     id: i32,
-    m: Real,
-    x: Real,
-    y: Real,
-    z: Real,
-    vx: Real,
-    vy: Real,
-    vz: Real,
+    pub m: Real,
+    pub x: Real,
+    pub y: Real,
+    pub z: Real,
+    pub vx: Real,
+    pub vy: Real,
+    pub vz: Real,
     #[serde(skip)]
     pub ax: Real,
     #[serde(skip)]
     pub ay: Real,
     #[serde(skip)]
     pub az: Real,
-    eps: Real,
+    pub eps: Real,
     pot: Real,
 }
 
