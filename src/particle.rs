@@ -12,18 +12,20 @@ pub struct Particle {
     vx: Real,
     vy: Real,
     vz: Real,
+    #[serde(skip)]
+    pub ax: Real,
+    #[serde(skip)]
+    pub ay: Real,
+    #[serde(skip)]
+    pub az: Real,
     eps: Real,
     pot: Real,
 }
 
 impl Particle {
-    fn dist2(&self, rhs: &Particle) -> Real {
-        let (rx, ry, rz) = (self.x - rhs.x, self.y - rhs.y, self.z - rhs.z);
-        rx * rx + ry * ry + rz * rz
-    }
-
-    pub fn force(&self, rhs: &Particle) -> Real {
-        let r2 = self.dist2(rhs);
-        self.m * rhs.m / r2
+    pub fn acc(&self, rhs: &Particle) -> (Real, Real, Real) {
+        let (rx, ry, rz) = (rhs.x - self.x, rhs.y - self.y, rhs.z - self.z);
+        let r2 = rx * rx + ry * ry + rz * rz;
+        (rhs.m * rx / r2, rhs.m * ry / r2, rhs.m * rz / r2)
     }
 }
