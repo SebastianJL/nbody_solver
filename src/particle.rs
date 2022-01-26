@@ -23,9 +23,16 @@ pub struct Particle {
 }
 
 impl Particle {
-    pub fn acc(&self, rhs: &Particle) -> (Real, Real, Real) {
-        let (rx, ry, rz) = (rhs.x - self.x, rhs.y - self.y, rhs.z - self.z);
+    /// Calculate the acceleration that particle 2 causes on particle 1.
+    ///
+    /// # Arguments:
+    /// * `p2`: Particle 2.
+    /// * `eps2`: Softening factor squared.
+    ///
+    pub fn acc(&self, p2: &Particle, eps2: Real) -> (Real, Real, Real) {
+        let (rx, ry, rz) = (p2.x - self.x, p2.y - self.y, p2.z - self.z);
         let r2 = rx * rx + ry * ry + rz * rz;
-        (rhs.m * rx / r2, rhs.m * ry / r2, rhs.m * rz / r2)
+        let r2_eps = (r2 + eps2).powi(3).sqrt();
+        (p2.m * rx / r2_eps, p2.m * ry / r2_eps, p2.m * rz / r2_eps)
     }
 }
