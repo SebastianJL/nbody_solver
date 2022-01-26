@@ -33,6 +33,7 @@ def number_of_particles_in_shell(rmin: float, rmax: float, a: float, N: int) -> 
     The cumulative mass distribution is
     M(r) = M * r**2 / (r+a)**2
     where M is the total mass of the system and a is a scaling parameter.
+    See `Hernquist AN ANALYTICAL MODEL FOR SPHERICAL GALAXIES AND BULGES for reference`.
 
     All particles are assumed to have the same mass m, therefore M = N*m, and it follows that
     N(r) = N * r**2 / (r+a)**2 .
@@ -93,6 +94,19 @@ if __name__ == '__main__':
     print(f'{a_err = : .4}')
     print(f'{a_rerr = : .1%}')
     print(f'{chi2 = : .2}')
+
+
+    # Estimate mean interparticle separation
+    R_hm = (1 + np.sqrt(2)) * a_opt  # See `Hernquist, AN ANALYTICAL MODEL FOR SPHERICAL GALAXIES AND BULGES` for formula.
+    print(f'half mass radius {R_hm = }')
+    N_hm = r[r < R_hm].count()
+    print(f'number of particles contained in R_hm {N_hm = }')
+    print(f'number of particles contained in R_hm {r.count() // 2 = }')
+    r_mean = 4/3 * np.pi * R_hm / np.power(N_hm, 1/3)  # https://en.wikipedia.org/wiki/Mean_inter-particle_distance
+    print(f'mean inter-particle separation {r_mean = }')
+
+
+
 
     # Plot.
     fig, ax = plt.subplots()
