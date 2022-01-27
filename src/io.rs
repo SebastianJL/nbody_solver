@@ -24,6 +24,7 @@ pub fn write_positions_and_accelerations(
 ) -> std::io::Result<()> {
     let mut file = File::create(path)?;
     for p in particles.iter() {
+        file.write_f64::<LittleEndian>(p.m as f64)?;
         file.write_f64::<LittleEndian>(p.x as f64)?;
         file.write_f64::<LittleEndian>(p.y as f64)?;
         file.write_f64::<LittleEndian>(p.z as f64)?;
