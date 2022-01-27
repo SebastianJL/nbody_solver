@@ -1,6 +1,7 @@
 use serde::Deserialize;
 
-use crate::{Real, Vector3D};
+use crate::Real;
+use crate::vector3d::Vector3D;
 
 // ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential
 #[derive(Debug, Deserialize)]

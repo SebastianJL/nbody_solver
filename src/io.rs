@@ -1,7 +1,9 @@
-use crate::{Particle, Vector3D};
-use byteorder::{LittleEndian, WriteBytesExt};
 use std::fs::File;
 use std::path::Path;
+
+use byteorder::{LittleEndian, WriteBytesExt};
+
+use crate::particle::Particle;
 
 pub fn read_csv_file(p: &Path) -> csv::Result<Vec<Particle>> {
     let mut reader = csv::ReaderBuilder::new()
