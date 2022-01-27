@@ -14,7 +14,7 @@ fn main() {
     let t0 = std::time::Instant::now();
     math::calculate_accelerations(&mut particles);
     let dt1 = t0.elapsed();
-    io::write_positions_and_accelerations(out_file, &particles).expect("Error writing file.");
+    io::write_particles(out_file, &particles).expect("Error writing file.");
     let dt2 = t0.elapsed() - dt1;
 
     println!("{:?}", dt1);
