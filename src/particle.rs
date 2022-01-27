@@ -1,5 +1,6 @@
-use crate::{Real, Vector3D};
 use serde::Deserialize;
+
+use crate::{Real, Vector3D};
 
 // ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential
 #[derive(Debug, Deserialize)]
@@ -12,6 +13,12 @@ pub struct Particle {
     pub vx: Real,
     pub vy: Real,
     pub vz: Real,
+    #[serde(skip_deserializing)]
+    pub ax: Real,
+    #[serde(skip_deserializing)]
+    pub ay: Real,
+    #[serde(skip_deserializing)]
+    pub az: Real,
     pub eps: Real,
     pot: Real,
 }

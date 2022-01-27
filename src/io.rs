@@ -16,12 +16,18 @@ pub fn read_csv_file(p: &Path) -> csv::Result<Vec<Particle>> {
     Ok(particles)
 }
 
-pub fn write_accelerations(path: &Path, vecs: &Vec<Vector3D>) -> std::io::Result<()> {
+pub fn write_positions_and_accelerations(
+    path: &Path,
+    particles: &Vec<Particle>,
+) -> std::io::Result<()> {
     let mut file = File::create(path)?;
-    for a in vecs.iter() {
-        file.write_f64::<LittleEndian>(a.0 as f64)?;
-        file.write_f64::<LittleEndian>(a.1 as f64)?;
-        file.write_f64::<LittleEndian>(a.2 as f64)?;
+    for p in particles.iter() {
+        file.write_f64::<LittleEndian>(p.x as f64)?;
+        file.write_f64::<LittleEndian>(p.y as f64)?;
+        file.write_f64::<LittleEndian>(p.z as f64)?;
+        file.write_f64::<LittleEndian>(p.ax as f64)?;
+        file.write_f64::<LittleEndian>(p.ay as f64)?;
+        file.write_f64::<LittleEndian>(p.az as f64)?;
     }
     Ok(())
 }
