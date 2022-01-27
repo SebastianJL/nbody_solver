@@ -64,7 +64,7 @@ def residual(N: int, bin_edges: np.array, a: np.array) -> np.array:
     return n_per_bin
 
 
-if __name__ == '__main__':
+def main():
     # Read data.
     header = 'ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential'.split(', ')
     data = pd.read_csv('data/data.txt', delimiter='\t', header=None, names=header, index_col='ID')
@@ -90,11 +90,10 @@ if __name__ == '__main__':
     a_err = np.sqrt(pcov[0, 0])
     a_rerr = a_err / a_opt
     chi2 = np.sum(np.square((func(xdata, a_opt) - ydata) / sigma)) / (len(xdata) - len(p0))
-    print(f'{a_opt = : .4}')
-    print(f'{a_err = : .4}')
+    print(f'{a_opt = }')
+    print(f'{a_err = }')
     print(f'{a_rerr = : .1%}')
     print(f'{chi2 = : .2}')
-
 
     # Estimate mean interparticle separation
     R_hm = (1 + np.sqrt(2)) * a_opt  # See `Hernquist, AN ANALYTICAL MODEL FOR SPHERICAL GALAXIES AND BULGES` for formula.
@@ -102,11 +101,8 @@ if __name__ == '__main__':
     N_hm = r[r < R_hm].count()
     print(f'number of particles contained in R_hm {N_hm = }')
     print(f'number of particles contained in R_hm {r.count() // 2 = }')
-    r_mean = 4/3 * np.pi * R_hm / np.power(N_hm, 1/3)  # https://en.wikipedia.org/wiki/Mean_inter-particle_distance
+    r_mean = 4 / 3 * np.pi * R_hm / np.power(N_hm, 1 / 3)  # https://en.wikipedia.org/wiki/Mean_inter-particle_distance
     print(f'mean inter-particle separation {r_mean = }')
-
-
-
 
     # Plot.
     fig, ax = plt.subplots()
@@ -115,10 +111,14 @@ if __name__ == '__main__':
     ax.bar(midpoints, hist, widths, yerr=np.sqrt(hist), color='orange', capsize=3, label=f'binned data, {n_bins = }')
     ax.plot(midpoints, func(bin_edges, popt), color='blue', label='least-squares fit')
     ax.set_title(f"Hernquist particle distribution\n {N = }, {a_opt = :.3g}, {a_rerr = : .1%}, {chi2 = : .1f}")
-    ax.set_xlabel('r')
+    ax.set_xlabel('r $[L_0]$')
     ax.set_ylabel('# particles')
     ax.set_xscale('log')
     # ax.set_yscale('log')
     ax.legend()
 
     plt.show()
+
+
+if __name__ == '__main__':
+    main()
