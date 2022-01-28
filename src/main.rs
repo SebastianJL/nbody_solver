@@ -20,7 +20,7 @@ fn main() {
     // Calculate forces.
     let t1 = std::time::Instant::now();
     math::calculate_accelerations(&mut particles, eps2);
-    let dt1 = t0.elapsed();
+    let dt1 = t1.elapsed();
 
     // Write data.
     let out_file = format!(
@@ -30,10 +30,10 @@ fn main() {
     );
     let t2 = std::time::Instant::now();
     io::write_particles(out_file, &particles).expect("Error writing file.");
-    let dt2 = t1.elapsed();
+    let dt2 = t2.elapsed();
 
     // Print timings.
-    println!("{:?}", dt0);
-    println!("{:?}", dt1);
-    println!("{:?}", dt2);
+    println!("reading {:?}", dt0);
+    println!("force calculation {:?}", dt1);
+    println!("writing {:?}", dt2);
 }
