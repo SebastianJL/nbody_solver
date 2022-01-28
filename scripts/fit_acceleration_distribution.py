@@ -26,28 +26,37 @@ def acc_hernquist(r, M, a):
 
 
 def main():
-    path = Path('../output/accelerations.dat')
+    n = 50010
+    eps = 0
+    in_file = Path(f'../output/accelerations_n={n}_eps={eps}_.dat')
 
-    data = read_binary(path)
-    assert (data.shape[0] == 50010)
+    data = read_binary(in_file)
+    assert (data.shape[0] == n)
 
     a = 0.07842896999259844  # Hernquist scaling length. See fit_mass_distribution.py.
     R_hm = 0.18934428303908363  # Half mass radius. See fit_mass_distribution.py.
     r = data[['x', 'y', 'z']].apply(np.square).sum(axis=1).apply(np.sqrt)
     acc = data[['ax', 'ay', 'az']].apply(np.square).sum(axis=1).apply(np.sqrt)
     M = data['m'].sum()
-    r_model = np.linspace(0, R_hm, int(1e3))
+    r_min, r_max = 0, 4*R_hm
+    acc_min, acc_max = 0, acc_hernquist(r_min, M, a)
+    r_model = np.linspace(r_min, r_max, int(1e3))
     acc_model = acc_hernquist(r_model, M, a)
 
-    print(data.iloc[1])
-
     plt.plot(r, acc, '.', label='direct summation')
-    plt.plot(r_model, acc_model, label='Hernquist')
+    plt.plot(r_model, acc_model, label='M / (r+a)**2,')
+    plt.title(f'{n = }, $\\epsilon = {eps}$, {a = :g}')
     plt.xlabel('radius $[L_0]$')
     plt.ylabel(r'acceleration $[L_0/T_0^2]$')
-    plt.xlim(0, R_hm)
+    plt.xlim(r_min, r_max)
+    plt.ylim(acc_min, acc_max)
     plt.legend()
-    plt.show()
+
+    if False:
+        plt.show()
+    else:
+        out_file = Path(f'../output/acc_plot_n={n}_eps={eps}_.png')
+        plt.savefig(out_file, dpi=300)
 
 
 if __name__ == '__main__':
