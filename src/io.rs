@@ -18,7 +18,7 @@ pub fn read_csv_file(p: &Path) -> csv::Result<Vec<Particle>> {
     Ok(particles)
 }
 
-pub fn write_particles(path: &Path, particles: &Vec<Particle>) -> std::io::Result<()> {
+pub fn write_particles<P: AsRef<Path>>(path: P, particles: &Vec<Particle>) -> std::io::Result<()> {
     let mut file = File::create(path)?;
     for p in particles.iter() {
         file.write_f64::<LittleEndian>(p.m as f64)?;
