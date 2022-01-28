@@ -24,7 +24,7 @@ fn main() {
 
     // Write data.
     let out_file = format!(
-        "./output/accelerations_n={}_eps={}.dat",
+        "./output/accelerations_n={}_eps={}_.dat",
         particles.len(),
         eps
     );
