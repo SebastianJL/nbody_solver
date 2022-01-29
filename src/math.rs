@@ -36,6 +36,6 @@ pub fn calculate_accelerations(particles: &mut Vec<Particle>, eps2: Real) {
     for (p1, a) in particles.iter_mut().zip(accs.iter()) {
         p1.ax = a.0;
         p1.ay = a.1;
-        p1.ay = a.2;
+        p1.az = a.2;
     }
 }
