@@ -1,10 +1,13 @@
 # N body project
 
 ## Data format
-- data.txt\
+- data.txt
   - No header
   - Data in columns\
     ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential
+  - Separator is tab.
+- data_small_1001.txt
+  - Same as data.txt but with less lines.
 - data.ascii
   - No header
   - Data in single column of length 8*N, N=number of particles.
