@@ -10,12 +10,6 @@ use crate::Real;
 /// * `eps2`: Square of the softening parameter.
 ///
 /// returns: ()
-///
-/// # Examples
-///
-/// ```
-///
-/// ```
 pub fn calculate_accelerations(particles: &mut Vec<Particle>, eps2: Real) {
     let n = particles.len();
     let mut accs = vec![Vector3D(0., 0., 0.); n];

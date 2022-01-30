@@ -26,6 +26,7 @@ pub struct Particle {
 
 impl Particle {
     /// Calculate the acceleration that particle 2 causes on particle 1.
+    /// G=1 is assumed.
     ///
     /// # Arguments:
     /// * `p2`: Particle 2.
