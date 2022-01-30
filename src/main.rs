@@ -7,13 +7,10 @@ mod vector3d;
 
 type Real = f32;
 
-fn main() {
-    // let eps: Real = 0.;  // No softening.
-    // let eps: Real = 0.02710602183160793;  // Mean interparticle separation.
-    // let eps: Real = 0.5 * 0.02710602183160793; // Mean value.
-    let eps: Real = 0.1 * 0.02710602183160793; // Mean value.
+fn calculate_accelerations(eps: Real) {
     let eps2 = eps * eps;
 
+    println!("Running for eps={:?}...", eps);
     // Read data.
     let in_file = Path::new("data/data.txt");
     let t0 = std::time::Instant::now();
@@ -39,4 +36,12 @@ fn main() {
     println!("reading {:?}", dt0);
     println!("acceleration calculation {:?}", dt1);
     println!("writing {:?}", dt2);
+}
+
+fn main() {
+    let r_mean: Real = 0.02710602183160793; // Mean interparticle separation.
+    let eps_values = [0., 0.1 * r_mean, 0.5 * r_mean, r_mean];
+    for eps in eps_values {
+        calculate_accelerations(eps);
+    }
 }
