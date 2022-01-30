@@ -12,7 +12,7 @@ fn calculate_accelerations(eps: Real) {
 
     println!("Running for eps={:?}...", eps);
     // Read data.
-    let in_file = Path::new("data/data.txt");
+    let in_file = Path::new("data/data_small_1001.txt");
     let t0 = std::time::Instant::now();
     let mut particles = io::read_csv_file(in_file).expect("Error reading file.");
     let dt0 = t0.elapsed();

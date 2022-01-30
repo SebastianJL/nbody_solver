@@ -25,7 +25,7 @@ def acc_hernquist(r, M, a):
     return M / (r + a) ** 2
 
 
-def plot(path: Path, n, eps):
+def plot(path: Path, n, eps, save=False):
     in_file = path
 
     data = read_binary(in_file)
@@ -49,28 +49,30 @@ def plot(path: Path, n, eps):
     plt.ylabel(r'acceleration $[L_0/T_0^2]$')
     plt.legend()
 
-    out_file = Path(f'../output/accelerations_plot_n={n}_eps={eps}_.png')
-    plt.savefig(out_file, dpi=300)
+    if save:
+        out_file = Path(f'../output/accelerations_plot_n={n}_eps={eps}_.png')
+        plt.savefig(out_file, dpi=300)
 
 
 def main():
-    n = 50010
+    n = 1001
     eps = 0  # no softening.
-    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps)
+    show_plots = False
+    save = True
+    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps, save=save)
 
-    n = 50010
-    eps = 0.027106022  # mean inter-particle separation.
-    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps)
+    eps = 0.027106022  # mean inter-particle separation (for 50_010 particle dataset).
+    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps, save)
 
-    n = 50010
     eps = 0.013553011
-    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps)
+    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps, save)
 
-    n = 50010
     eps = 0.0027106022
-    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps)
+    plot(Path(f'../output/accelerations_n={n}_eps={eps}_.dat'), n, eps, save)
 
-    # plt.show()
+    if show_plots:
+        plt.show()
+
 
 if __name__ == '__main__':
     main()
