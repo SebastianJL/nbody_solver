@@ -49,7 +49,7 @@ def plot(path: Path, n, eps):
     plt.ylabel(r'acceleration $[L_0/T_0^2]$')
     plt.legend()
 
-    out_file = Path(f'../figures/accelerations_plot_n={n}_eps={eps}_.png')
+    out_file = Path(f'../output/accelerations_plot_n={n}_eps={eps}_.png')
     plt.savefig(out_file, dpi=300)
 
 
