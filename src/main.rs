@@ -8,7 +8,10 @@ mod vector3d;
 type Real = f32;
 
 fn main() {
-    let eps: Real = 0.5; // Softening
+    // let eps: Real = 0.;  // No softening.
+    // let eps: Real = 0.02710602183160793;  // Mean interparticle separation.
+    // let eps: Real = 0.5 * 0.02710602183160793; // Mean value.
+    let eps: Real = 0.1 * 0.02710602183160793; // Mean value.
     let eps2 = eps * eps;
 
     // Read data.
@@ -34,6 +37,6 @@ fn main() {
 
     // Print timings.
     println!("reading {:?}", dt0);
-    println!("force calculation {:?}", dt1);
+    println!("acceleration calculation {:?}", dt1);
     println!("writing {:?}", dt2);
 }
