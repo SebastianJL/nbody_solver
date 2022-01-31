@@ -1,6 +1,7 @@
 from pathlib import Path
 import time
 import pandas as pd
+from matplotlib import pyplot as plt
 
 from src_python.tree import OctTree
 
@@ -13,15 +14,23 @@ def read_particles(path: Path):
 
 
 def main():
-    ipath = Path(f'../data/data.txt')
-
+    # Read file.
+    ipath = Path(f'../data/data_small_10.txt')
     masses, positions, velocities = read_particles(ipath)
     oct_tree = OctTree(masses, positions, velocities)
 
+    # Build tree.
     start = time.perf_counter()
     oct_tree.build()
     duration = time.perf_counter() - start
     print(duration)
+
+    # Plot tree.
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    oct_tree.plot_2d(ax, 0, 1)
+    plt.axis('equal')
+    plt.show()
 
 
 if __name__ == '__main__':
