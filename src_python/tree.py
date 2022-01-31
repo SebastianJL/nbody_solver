@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 import numpy.typing as npt
@@ -75,6 +75,21 @@ class OctTreeNode:
 
         self.com = center_of_mass(self.masses, self.positions)
 
+    def validate(self, leaf_counter: List[int]):
+        if self.is_leaf:
+            leaf_counter[0] += 1
+            assert len(self.positions) == 1
+            assert (self.nodes == None).all()
+        else:
+            assert len(self.positions) > 1
+
+        assert (self.min < self.positions).all()
+        assert (self.max > self.positions).all()
+
+        for node in self.nodes.flatten():
+            if node is not None:
+                node.validate(leaf_counter)
+
     def plot_2d(self, ax, dim1, dim2):
         xmin, xmax = self.min[dim1], self.max[dim2]
         ymin, ymax = self.min[dim1], self.max[dim2]
@@ -104,6 +119,12 @@ class OctTree:
 
         self.root = OctTreeNode(self.masses, self.positions, _min, _max)
         self.root.build()
+
+    def validate(self):
+        """Walk the tree and do some sanity checks."""
+        leaf_counter = [0]
+        self.root.validate(leaf_counter)
+        assert leaf_counter[0] == len(self.positions)
 
     def plot_2d(self, ax: Axes, dim1: int, dim2: int):
         """Plot a 2 dimensional projection of the OctTree.
