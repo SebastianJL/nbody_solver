@@ -85,9 +85,12 @@ class OctTreeNode:
 
         assert (self.min < self.positions).all()
         assert (self.max > self.positions).all()
+        assert len(self.nodes.flatten()) == 8
 
         for node in self.nodes.flatten():
             if node is not None:
+                assert (self.min <= node.min).all()
+                assert (self.max >= node.max).all()
                 node.validate(leaf_counter)
 
     def plot_2d(self, ax, dim1, dim2):
