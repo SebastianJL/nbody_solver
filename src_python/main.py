@@ -25,7 +25,10 @@ def main():
     tree_build_duration = time.perf_counter() - start
     print(f'{tree_build_duration = :g}s')
 
+    start = time.perf_counter()
     oct_tree.validate()
+    validate_duration = time.perf_counter() - start
+    print(f'{validate_duration = :g}s')
 
     # Plot tree.
     fig = plt.figure()
