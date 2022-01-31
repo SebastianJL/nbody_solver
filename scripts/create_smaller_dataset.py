@@ -10,7 +10,7 @@ def main():
     cols = ['id', 'mass', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'eps', 'pot']
     data = pd.read_csv(ipath, header=None, names=cols, sep='\t')
 
-    target_lines = 1000
+    target_lines = 10
     step = math.floor(data.shape[0] / target_lines)
     data_small = data.iloc[::step]
     data_small.loc[:, 'mass'] *= step

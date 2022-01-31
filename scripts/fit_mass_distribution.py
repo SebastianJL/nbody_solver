@@ -67,7 +67,7 @@ def residual(N: int, bin_edges: np.array, a: np.array) -> np.array:
 def main():
     # Read data.
     header = 'ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential'.split(', ')
-    data = pd.read_csv('data/data.txt', delimiter='\t', header=None, names=header, index_col='ID')
+    data = pd.read_csv('data/data_small_1001.txt', delimiter='\t', header=None, names=header, index_col='ID')
     print(f'{data.isna().any().any() = }\n')
 
     # Bin radius.
