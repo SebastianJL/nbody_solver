@@ -96,8 +96,8 @@ class OctTreeNode:
     def plot_2d(self, ax, dim1, dim2, level):
         if level == 0:
             return
-        xmin, xmax = self.min[dim1], self.max[dim2]
-        ymin, ymax = self.min[dim1], self.max[dim2]
+        xmin, xmax = self.min[dim1], self.max[dim1]
+        ymin, ymax = self.min[dim2], self.max[dim2]
         plot_box(xmin, xmax, ymin, ymax, ax)
 
         for node in self.nodes.flatten():
@@ -131,14 +131,14 @@ class OctTree:
         self.root.validate(leaf_counter)
         assert leaf_counter[0] == len(self.positions)
 
-    def plot_2d(self, ax: Axes, dim1: int, dim2: int, level: int):
+    def plot_2d(self, ax: Axes, dim1: int, dim2: int, level: int = -1):
         """Plot a 2 dimensional projection of the OctTree.
 
         Args:
             ax: Axes to plot onto.
             dim1: First dimension to plot. Must be in (0, 1, 2)
             dim2: Second dimension to plot. Must be in (0, 1, 2)
-            level: Plot boundaries n levels deep.
+            level: Plot boundaries n levels deep. -1 means plot all levels.
         """
         xs, ys = self.positions[:, dim1], self.positions[:, dim2]
         ax.scatter(xs, ys)

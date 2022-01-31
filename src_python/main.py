@@ -33,7 +33,7 @@ def main():
     # Plot tree.
     fig = plt.figure()
     ax = fig.add_subplot()
-    oct_tree.plot_2d(ax, 0, 1, level=2)
+    oct_tree.plot_2d(ax, 0, 1, level=-1)
     plt.axis('equal')
     plt.show()
 
