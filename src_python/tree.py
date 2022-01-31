@@ -93,14 +93,16 @@ class OctTreeNode:
                 assert (self.max >= node.max).all()
                 node.validate(leaf_counter)
 
-    def plot_2d(self, ax, dim1, dim2):
+    def plot_2d(self, ax, dim1, dim2, level):
+        if level == 0:
+            return
         xmin, xmax = self.min[dim1], self.max[dim2]
         ymin, ymax = self.min[dim1], self.max[dim2]
         plot_box(xmin, xmax, ymin, ymax, ax)
 
         for node in self.nodes.flatten():
             if node is not None:
-                node.plot_2d(ax, dim1, dim2)
+                node.plot_2d(ax, dim1, dim2, level-1)
 
 
 @dataclass
@@ -129,22 +131,19 @@ class OctTree:
         self.root.validate(leaf_counter)
         assert leaf_counter[0] == len(self.positions)
 
-    def plot_2d(self, ax: Axes, dim1: int, dim2: int):
+    def plot_2d(self, ax: Axes, dim1: int, dim2: int, level: int):
         """Plot a 2 dimensional projection of the OctTree.
 
         Args:
             ax: Axes to plot onto.
             dim1: First dimension to plot. Must be in (0, 1, 2)
             dim2: Second dimension to plot. Must be in (0, 1, 2)
+            level: Plot boundaries n levels deep.
         """
         xs, ys = self.positions[:, dim1], self.positions[:, dim2]
         ax.scatter(xs, ys)
-        xmin, xmax = self.root.min[dim1], self.root.max[dim2]
-        ymin, ymax = self.root.min[dim1], self.root.max[dim2]
-        ax.set_xlim(xmin - 10, xmax + 10)
-        ax.set_ylim(ymin - 10, ymax + 10)
 
-        self.root.plot_2d(ax, dim1, dim2)
+        self.root.plot_2d(ax, dim1, dim2, level)
 
 
 def center_of_mass(masses: np.ndarray, positions: np.ndarray) -> np.ndarray:
