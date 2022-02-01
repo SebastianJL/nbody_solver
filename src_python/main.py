@@ -1,12 +1,14 @@
 from pathlib import Path
 import time
+
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
 from src_python.tree import OctTree
 
 
-def read_particles(path: Path):
+def read_particles(path: Path) -> (np.ndarray, np.ndarray, np.ndarray):
     cols = ['id', 'mass', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'eps', 'pot']
     data = pd.read_csv(path, header=None, names=cols, sep='\t')
 
@@ -31,11 +33,11 @@ def main():
     print(f'{validate_duration = :g}s')
 
     # Plot tree.
-    fig = plt.figure()
-    ax = fig.add_subplot()
-    oct_tree.plot_2d(ax, 0, 1, level=-1)
-    plt.axis('equal')
-    plt.show()
+    # fig = plt.figure()
+    # ax = fig.add_subplot()
+    # oct_tree.plot_2d(ax, 0, 1, level=-1)
+    # plt.axis('equal')
+    # plt.show()
 
 
 if __name__ == '__main__':
