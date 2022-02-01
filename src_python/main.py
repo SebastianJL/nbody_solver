@@ -27,17 +27,23 @@ def main():
     tree_build_duration = time.perf_counter() - start
     print(f'{tree_build_duration = :g}s')
 
+    # Validate tree
     start = time.perf_counter()
     oct_tree.validate()
     validate_duration = time.perf_counter() - start
     print(f'{validate_duration = :g}s')
 
     # Plot tree.
+    # start = time.perf_counter()
     # fig = plt.figure()
     # ax = fig.add_subplot()
     # oct_tree.plot_2d(ax, 0, 1, level=-1)
     # plt.axis('equal')
+    # plot_duration = time.perf_counter() - start
+    # print(f'{plot_duration = :g}s')
     # plt.show()
+
+    accelerations = oct_tree.calculate_accelerations()
 
 
 if __name__ == '__main__':
