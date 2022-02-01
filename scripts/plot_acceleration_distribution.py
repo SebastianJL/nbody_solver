@@ -25,7 +25,7 @@ def acc_hernquist(r, M, a):
     return M / (r + a) ** 2
 
 
-def plot(path: Path, n, eps, save=False):
+def plot(path: Path, n, eps, kind, save=False):
     in_file = path
 
     data = read_binary(in_file)
@@ -50,25 +50,28 @@ def plot(path: Path, n, eps, save=False):
     plt.legend()
 
     if save:
-        out_file = Path(f'../output/acc_direct_plot_n={n}_eps={eps}_.png')
+        out_file = Path(f'../output/acc_{kind}_plot_n={n}_eps={eps}_.png')
         plt.savefig(out_file, dpi=300)
 
 
 def main():
     n = 1001
-    eps = 0  # no softening.
+    # kind = 'tree'
+    kind = 'direct'
     show_plots = False
     save = True
-    plot(Path(f'../output/acc_direct_n={n}_eps={eps}_.dat'), n, eps, save=save)
 
-    eps = 0.027106022  # mean inter-particle separation (for 50_010 particle dataset).
-    plot(Path(f'../output/acc_direct_n={n}_eps={eps}_.dat'), n, eps, save)
+    eps = 0  # no softening.
+    plot(Path(f'../output/acc_{kind}_n={n}_eps={eps}_.dat'), n, eps, kind, save=save)
 
-    eps = 0.013553011
-    plot(Path(f'../output/acc_direct_n={n}_eps={eps}_.dat'), n, eps, save)
-
-    eps = 0.0027106022
-    plot(Path(f'../output/acc_direct_n={n}_eps={eps}_.dat'), n, eps, save)
+    # eps = 0.027106022  # mean inter-particle separation (for 50_010 particle dataset).
+    # plot(Path(f'../output/acc_{kind}_n={n}_eps={eps}_.dat'), n, eps, save)
+    #
+    # eps = 0.013553011
+    # plot(Path(f'../output/acc_{kind}_n={n}_eps={eps}_.dat'), n, eps, save)
+    #
+    # eps = 0.0027106022
+    # plot(Path(f'../output/acc_{kind}_n={n}_eps={eps}_.dat'), n, eps, save)
 
     if show_plots:
         plt.show()
