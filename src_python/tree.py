@@ -12,12 +12,24 @@ class OctTreeNode:
     positions: npt.NDArray[np.float32] = field(repr=False)  # shape (N, 3)
     min: np.ndarray[(3,), np.float32]
     max: np.ndarray[(3,), np.float32]
-    is_leaf: bool = field(default=False)
+    is_leaf: bool = field(init=False, default=None)
     com: np.ndarray[(3,), np.float32] = field(init=False, default=None)
+    total_mass: np.float32 = field(init=False, default=None)
+    n_particles: int = field(init=False, default=None)
     nodes: np.ndarray[(2, 2, 2), Optional["OctTreeNode"]] = \
         field(init=False, default_factory=lambda: np.empty((2, 2, 2), dtype=object))
 
     def build(self):
+        # Calculate properties of node.
+        self.com = center_of_mass(self.masses, self.positions)
+        self.total_mass = self.masses.sum()
+        self.n_particles = len(self.masses)
+        self.is_leaf = (self.n_particles == 1)
+
+        if self.is_leaf:
+            return
+
+        # Build Rest of the tree.
         intersections = (self.min + self.max) / 2
 
         x_lower = self.positions[:, 0] <= intersections[0]
@@ -52,7 +64,8 @@ class OctTreeNode:
                     child_masses = self.masses[mask]
                     child_positions = self.positions[mask]
 
-                    if child_masses.shape[0] == 0:
+                    n_particles = child_masses.shape[0]
+                    if n_particles == 0:
                         self.nodes[i, j, k] = None
                     else:
                         child_min = np.array((
@@ -65,15 +78,12 @@ class OctTreeNode:
                             self.max[1] if j == 1 else intersections[1],
                             self.max[2] if k == 1 else intersections[2],
                         ))
-                        is_leaf = child_masses.shape[0] == 1
-                        self.nodes[i, j, k] = OctTreeNode(child_masses, child_positions, child_min, child_max, is_leaf)
+                        self.nodes[i, j, k] = OctTreeNode(child_masses, child_positions, child_min, child_max)
 
         # Build child nodes.
         for node in self.nodes.flatten():
-            if node is not None and not node.is_leaf:
+            if node is not None:
                 node.build()
-
-        self.com = center_of_mass(self.masses, self.positions)
 
     def validate(self, leaf_counter: List[int]):
         if self.is_leaf:
@@ -102,7 +112,7 @@ class OctTreeNode:
 
         for node in self.nodes.flatten():
             if node is not None:
-                node.plot_2d(ax, dim1, dim2, level-1)
+                node.plot_2d(ax, dim1, dim2, level - 1)
 
 
 @dataclass
