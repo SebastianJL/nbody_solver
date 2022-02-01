@@ -6,11 +6,13 @@ use crate::Real;
 ///
 /// # Arguments
 ///
+/// Direct sum acceleration calculation.
+///
 /// * `particles`: List of all particles in the system. Particle accelerations are mutated in place.
 /// * `eps2`: Square of the softening parameter.
 ///
 /// returns: ()
-pub fn calculate_accelerations(particles: &mut Vec<Particle>, eps2: Real) {
+pub fn calculate_accelerations_direct(particles: &mut Vec<Particle>, eps2: Real) {
     let n = particles.len();
     let mut accs = vec![Vector3D(0., 0., 0.); n];
 

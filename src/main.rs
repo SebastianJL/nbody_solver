@@ -19,15 +19,11 @@ fn calculate_accelerations(eps: Real) {
 
     // Calculate forces.
     let t1 = std::time::Instant::now();
-    math::calculate_accelerations(&mut particles, eps2);
+    math::calculate_accelerations_direct(&mut particles, eps2);
     let dt1 = t1.elapsed();
 
     // Write data.
-    let out_file = format!(
-        "./output/accelerations_n={}_eps={}_.dat",
-        particles.len(),
-        eps
-    );
+    let out_file = format!("./output/acc_direct_n={}_eps={}_.dat", particles.len(), eps);
     let t2 = std::time::Instant::now();
     io::write_particles(out_file, &particles).expect("Error writing file.");
     let dt2 = t2.elapsed();
