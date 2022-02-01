@@ -14,17 +14,39 @@ class OctTreeNode:
     max: np.ndarray[(3,), np.float32]
     is_leaf: bool = field(init=False, default=None)
     com: np.ndarray[(3,), np.float32] = field(init=False, default=None)
-    total_mass: np.float32 = field(init=False, default=None)
     n_particles: int = field(init=False, default=None)
+    size: int = field(init=False, default=None)
+    _monopole: np.float32 = field(init=False, default=None)
+    _quadrupole: np.float32 = field(init=False, default=None)
     nodes: np.ndarray[(2, 2, 2), Optional["OctTreeNode"]] = \
         field(init=False, default_factory=lambda: np.empty((2, 2, 2), dtype=object))
+
+    def monopole(self) -> np.float32:
+        """Calculate the monopole.
+
+        Returns:
+            M = sum_i m_i
+        """
+        if self._monopole is None:
+            self._monopole = self.masses.sum()
+        return self._monopole
+
+    def quadrupole(self):
+        """Calculate the quadrupole.
+
+        Returns:
+            Q_ij = sum_k m_k ( 3(s-x_k)[i] (s-x_k)[j] - delta_ij (s-x_k)^2 )
+        """
+        if self._quadrupole is None:
+            self._quadrupole = 0
+        return self._quadrupole
 
     def build(self):
         # Calculate properties of node.
         self.com = center_of_mass(self.masses, self.positions)
-        self.total_mass = self.masses.sum()
         self.n_particles = len(self.masses)
         self.is_leaf = (self.n_particles == 1)
+        self.size = np.sqrt(np.sum((self.max - self.min) ** 2)) / 2  # Diameter of sphere enclosing the node box.
 
         if self.is_leaf:
             return
@@ -125,20 +147,30 @@ class OctTreeNode:
         Returns:
             The accelerations for each position.
         """
-        if not self.is_leaf:
-            acc = sum(node.calculate_acceleration(position, eps2) for node in self.nodes.flatten() if node is not None)
-        elif np.all(self.positions[0] == position):
-            # Don't compute self interaction
-            acc = np.zeros(3)
-        else:
-            # Compute softened monopole for leave.
-            r = position
-            com = self.com
-            M = self.total_mass
 
-            y = r - com
-            y2 = y.dot(y)
-            acc = M * y / (y2 + eps2) ** (3 / 2)
+        r = position
+        com = self.com
+        y = r - com
+        y2 = y.dot(y)
+
+        if self.is_leaf:
+            if np.all(self.positions[0] == position):
+                # Don't compute self interaction.
+                return np.zeros(3)
+            else:
+                # Compute softened acceleration for leaf.
+                M = self.monopole()
+                acc = M * y / (y2 + eps2) ** (3 / 2)
+        else:
+            opening_angle = self.size / np.sqrt(y2)
+            if opening_angle < 0.9:
+                M = self.monopole()
+                acc = M * y / (y2) ** (3 / 2)
+                # Q_ij = self.quadrupole()
+            else:
+                # Compute accelerations from children.
+                acc = sum(
+                    node.calculate_acceleration(position, eps2) for node in self.nodes.flatten() if node is not None)
 
         return acc
 
