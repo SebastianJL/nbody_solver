@@ -17,7 +17,7 @@ class OctTreeNode:
     n_particles: int = field(init=False, default=None)
     size: int = field(init=False, default=None)
     _monopole: np.float32 = field(init=False, default=None)
-    _quadrupole: np.float32 = field(init=False, default=None)
+    _quadrupole: np.ndarray[(3, 3), np.float32] = field(init=False, default=None)
     nodes: np.ndarray[(2, 2, 2), Optional["OctTreeNode"]] = \
         field(init=False, default_factory=lambda: np.empty((2, 2, 2), dtype=object))
 
@@ -31,14 +31,27 @@ class OctTreeNode:
             self._monopole = self.masses.sum()
         return self._monopole
 
-    def quadrupole(self):
+    def quadrupole(self) -> np.ndarray[(3, 3), np.float32]:
         """Calculate the quadrupole.
 
         Returns:
-            Q_ij = sum_k m_k ( 3(s-x_k)[i] (s-x_k)[j] - delta_ij (s-x_k)^2 )
+            Quadrupole matrix Q where
+            Q_ij = sum_k m_k ( 3(r_k)[i] (r_k)[j] - delta_ij (r_k)^2 )
+            where r_k = s - x_k
+            and s = center of mass.
         """
         if self._quadrupole is None:
-            self._quadrupole = 0
+            s = self.com
+            Q = np.zeros((3, 3), dtype=np.float32)
+            for i in range(3):
+                for j in range(3):
+                    for (m_k, x_k) in zip(self.masses, self.positions):
+                        r_k = s - x_k
+                        Q[i, j] += m_k * r_k[i] * r_k[j]
+                        if i == j:
+                            Q[i, j] -= r_k.dot(r_k)
+
+            self._quadrupole = Q
         return self._quadrupole
 
     def build(self):
@@ -129,16 +142,16 @@ class OctTreeNode:
         (3,), np.float32]:
         """ Calculate the acceleration that the tree causes at `position`.
 
-         G=1 is assumed.
+        G=1 is assumed.
 
-        The acceleration is only calculated on leaf nodes (for now).
-        Todo: Step1. Implement non softened monopole for distant interactions.
-        Todo: Step2. Implement non softened quadrupole for distant interactions.
-
-         Formula used is the softened acceleration in the monopole expansion:
-             acc(r) = M * y / (y^2 + eps^2)^(3/2)
-         where y = r - com is the distance vector from COM of the node to `position`,
-         and M is the total mass of the node.
+        Formulas used:
+        * For leaf nodes:
+            acc(r) = M / (y^2 + eps^2)^(3/2) * y
+            where y = r - com is the distance vector from COM of the node to `position`,
+            and M is the total mass of the node.
+        * For nodes that fulfill the angle criterion:
+            acc = M / abs(y)^3 * y - 1/2 (y.Q + Q.y) / abs(y)^5 + 5/2 y.Q.y / abs(y)^7 * y
+            where Q is the quadrupole.
 
         Args:
             eps2: Softening factor squared.
@@ -162,13 +175,15 @@ class OctTreeNode:
                 M = self.monopole()
                 acc = M * y / (y2 + eps2) ** (3 / 2)
         else:
-            opening_angle = self.size / np.sqrt(y2)
+            y_abs = np.sqrt(y2)
+            opening_angle = self.size / y_abs
             if opening_angle < 0.9:
                 M = self.monopole()
-                acc = M * y / (y2) ** (3 / 2)
-                # Q_ij = self.quadrupole()
+                acc = M * y / y_abs ** 3
+                Q = self.quadrupole()
+                acc += - 1 / 2 * (y.dot(Q) + Q.dot(y)) / y_abs ** 5 + 5 / 2 * y.dot(Q).dot(y) / y_abs ** 7 * y
             else:
-                # Compute accelerations from children.
+                # Compute accelerations for children.
                 acc = sum(
                     node.calculate_acceleration(position, eps2) for node in self.nodes.flatten() if node is not None)
 
