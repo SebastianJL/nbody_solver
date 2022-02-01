@@ -103,6 +103,45 @@ class OctTreeNode:
                 assert (self.max >= node.max).all()
                 node.validate(leaf_counter)
 
+    def calculate_acceleration(self, position: np.ndarray[(1, 3), np.float32], eps2: np.float32) -> np.ndarray[
+        (3,), np.float32]:
+        """ Calculate the acceleration that the tree causes at `position`.
+
+         G=1 is assumed.
+
+        The acceleration is only calculated on leaf nodes (for now).
+        Todo: Step1. Implement non softened monopole for distant interactions.
+        Todo: Step2. Implement non softened quadrupole for distant interactions.
+
+         Formula used is the softened acceleration in the monopole expansion:
+             acc(r) = M * y / (y^2 + eps^2)^(3/2)
+         where y = r - com is the distance vector from COM of the node to `position`,
+         and M is the total mass of the node.
+
+        Args:
+            eps2: Softening factor squared.
+            position: Position at which acceleration is to be calculated.
+
+        Returns:
+            The accelerations for each position.
+        """
+        if not self.is_leaf:
+            acc = sum(node.calculate_acceleration(position, eps2) for node in self.nodes.flatten() if node is not None)
+        elif np.all(self.positions[0] == position):
+            # Don't compute self interaction
+            acc = np.zeros(3)
+        else:
+            # Compute softened monopole for leave.
+            r = position
+            com = self.com
+            M = self.total_mass
+
+            y = r - com
+            y2 = y.dot(y)
+            acc = M * y / (y2 + eps2) ** (3 / 2)
+
+        return acc
+
     def plot_2d(self, ax, dim1, dim2, level):
         if level == 0:
             return
@@ -140,6 +179,17 @@ class OctTree:
         leaf_counter = [0]
         self.root.validate(leaf_counter)
         assert leaf_counter[0] == len(self.positions)
+
+    def calculate_accelerations(self, eps2) -> np.ndarray[('N', 3), np.float32]:
+        """Calculate all accelerations caused on self.positions.
+
+        Args:
+            eps2: Softening factor squared.
+        """
+        acc = np.zeros((self.root.n_particles, 3))
+        for (i, pos) in enumerate(self.positions):
+            acc[i] = self.root.calculate_acceleration(pos, eps2)
+        return acc
 
     def plot_2d(self, ax: Axes, dim1: int, dim2: int, level: int = -1):
         """Plot a 2 dimensional projection of the OctTree.

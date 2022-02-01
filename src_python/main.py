@@ -15,10 +15,20 @@ def read_particles(path: Path) -> (np.ndarray, np.ndarray, np.ndarray):
     return data['mass'].to_numpy(), data[['x', 'y', 'z']].to_numpy(), data[['vx', 'vy', 'vz']].to_numpy()
 
 
+def write_particles(path: Path, masses, positions, accelerations):
+    """Write data into binary file.
+
+    File has order
+        m, x, y, z, ax, ay, az, ...repeating.
+    """
+    data = np.concatenate([masses[:, None], positions, accelerations], axis=1)
+    data.tofile(path)
+
+
 def main():
     # Read file.
-    ipath = Path(f'../data/data_small_10.txt')
-    masses, positions, velocities = read_particles(ipath)
+    in_path = Path(f'../data/data_small_1001.txt')
+    masses, positions, velocities = read_particles(in_path)
     oct_tree = OctTree(masses, positions, velocities)
 
     # Build tree.
@@ -43,7 +53,20 @@ def main():
     # print(f'{plot_duration = :g}s')
     # plt.show()
 
-    accelerations = oct_tree.calculate_accelerations()
+    # Calculate accelerations.
+    eps = 0
+    eps2 = eps*2
+    start = time.perf_counter()
+    accelerations = oct_tree.calculate_accelerations(eps2)
+    acc_calc_duration = time.perf_counter() - start
+    print(f'{acc_calc_duration = :g}s')
+
+    out_path = Path(f'../output/acc_tree_n={len(masses)}_eps={eps}_.dat')
+    start = time.perf_counter()
+    write_particles(out_path, masses, positions, accelerations)
+    write_duration = time.perf_counter() - start
+    print(f'{write_duration = :g}s')
+
 
 
 if __name__ == '__main__':
