@@ -42,7 +42,7 @@ def plot(path: Path, n, eps, kind, save=False):
     acc_model = acc_hernquist(r_model, M, a)
 
     fig = plt.figure()
-    plt.loglog(r, acc, '.', label='direct summation')
+    plt.loglog(r, acc, '.', label=kind)
     plt.loglog(r_model, acc_model, label='M / (r+a)**2,')
     plt.title(f'{n = }, $\\epsilon = {eps}$, {a = :g}')
     plt.xlabel('radius $[L_0]$')
@@ -56,11 +56,15 @@ def plot(path: Path, n, eps, kind, save=False):
 
 def main():
     n = 1001
-    # kind = 'tree'
-    kind = 'direct'
-    show_plots = False
-    save = True
+    # kind = 'direct'
+    show_plots = True
+    save = False
 
+    kind = 'tree'
+    eps = 0  # no softening.
+    plot(Path(f'../output/acc_{kind}_n={n}_eps={eps}_.dat'), n, eps, kind, save=save)
+
+    kind = 'direct'
     eps = 0  # no softening.
     plot(Path(f'../output/acc_{kind}_n={n}_eps={eps}_.dat'), n, eps, kind, save=save)
 
