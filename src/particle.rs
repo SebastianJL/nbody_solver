@@ -28,6 +28,10 @@ impl Particle {
     /// Calculate the acceleration that particle 2 causes on particle 1.
     /// G=1 is assumed.
     ///
+    /// Formula usd is the softened acceleration:
+    ///     m_2 * r / (r^2 + eps^2)^(3/2)
+    /// where r = r_2 - r_1 is the distance vector from particle 2 to particle 1.
+    ///
     /// # Arguments:
     /// * `p2`: Particle 2.
     /// * `eps2`: Softening factor squared.
