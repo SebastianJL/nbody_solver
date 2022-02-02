@@ -1,4 +1,5 @@
 from functools import partial
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -67,13 +68,14 @@ def residual(N: int, bin_edges: np.array, a: np.array) -> np.array:
 def main():
     # Read data.
     header = 'ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential'.split(', ')
-    data = pd.read_csv('data/data_small_1001.txt', delimiter='\t', header=None, names=header, index_col='ID')
+    data = pd.read_csv('../data/data_small_1001.txt', delimiter='\t', header=None, names=header, index_col='ID')
     print(f'{data.isna().any().any() = }\n')
 
     # Bin radius.
     r = data[['x', 'y', 'z']].apply(np.square).sum(axis=1).apply(np.sqrt)
     print(f'{r.describe() = }\n')
-    n_bins = 70
+    # n_bins = 70  # For N = 50010
+    n_bins = 50  # For N = 1001
     bin_edges = log_bins(r.min(), r.max() + 1, n_bins)  # Make upper limit a little bigger to include last particle.
     hist, bin_edges = np.histogram(r, bins=bin_edges)
 
@@ -110,14 +112,16 @@ def main():
     widths = bin_edges[1:] - bin_edges[:-1]
     ax.bar(midpoints, hist, widths, yerr=np.sqrt(hist), color='orange', capsize=3, label=f'binned data, {n_bins = }')
     ax.plot(midpoints, func(bin_edges, popt), color='blue', label='least-squares fit')
-    ax.set_title(f"Hernquist particle distribution\n {N = }, {a_opt = :.3g}, {a_rerr = : .1%}, {chi2 = : .1f}")
+    ax.set_title(f"\n {N = }, {a_opt = :.3g}, {a_rerr = : .1%}, {chi2 = : .1f}")
     ax.set_xlabel('r $[L_0]$')
     ax.set_ylabel('# particles')
     ax.set_xscale('log')
     # ax.set_yscale('log')
     ax.legend()
 
-    plt.show()
+    # plt.show()
+    out_file = Path(f'../output/hernquist_mass_distribution_n={N}.png')
+    plt.savefig(out_file, dpi=300)
 
 
 if __name__ == '__main__':
