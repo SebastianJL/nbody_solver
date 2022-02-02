@@ -40,7 +40,14 @@ fn calculate_accelerations(eps: Real) {
 
 fn main() {
     let r_mean: Real = 0.02710602183160793; // Mean interparticle separation.
-    let eps_values = [0., 0.1 * r_mean, 0.5 * r_mean, r_mean];
+    let eps_values = [
+        0.,
+        0.1 * r_mean,
+        0.5 * r_mean,
+        r_mean,
+        1.5 * r_mean,
+        2. * r_mean,
+    ];
     for eps in eps_values {
         calculate_accelerations(eps);
     }
