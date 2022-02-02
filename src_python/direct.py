@@ -7,7 +7,9 @@ def calculate_accelerations_direct(
         eps2: np.float32) -> np.ndarray[('N', 3), np.float32]:
     acc = np.zeros_like(positions)
     for (i, p1) in enumerate(positions):
-        for (j, p2, m2) in enumerate(zip(positions, masses)):
+        for (j, (p2, m2)) in enumerate(zip(positions, masses)):
+            if i == j:
+                continue
             r = p2 - p1
             r2 = r.dot(r)
             acc[i] += m2 * r / (r2 + eps2)**(3/2)
