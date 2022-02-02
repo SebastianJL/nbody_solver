@@ -39,7 +39,7 @@ fn calculate_accelerations(eps: Real) {
 }
 
 fn main() {
-    let r_mean: Real = 0.02710602183160793; // Mean interparticle separation.
+    let r_mean: Real = 0.02710602183160793; // Mean interparticle separation for 50'010. See fit_mass_distribution.py
     let eps_values = [
         0.,
         0.1 * r_mean,
