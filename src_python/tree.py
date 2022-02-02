@@ -59,7 +59,7 @@ class OctTreeNode:
         self.com = center_of_mass(self.masses, self.positions)
         self.n_particles = len(self.masses)
         self.is_leaf = (self.n_particles == 1)
-        self.size = np.sqrt(np.sum((self.max - self.min) ** 2)) / 2  # Diameter of sphere enclosing the node box.
+        self.size = np.sqrt(np.sum((self.max - self.min) ** 2)) / 2  # Radius of sphere enclosing the node box.
 
         if self.is_leaf:
             return
