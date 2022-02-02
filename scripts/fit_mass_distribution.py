@@ -68,14 +68,14 @@ def residual(N: int, bin_edges: np.array, a: np.array) -> np.array:
 def main():
     # Read data.
     header = 'ID, Masses, x, y, z, Vx, Vy, Vz, softening, potential'.split(', ')
-    data = pd.read_csv('../data/data_small_1001.txt', delimiter='\t', header=None, names=header, index_col='ID')
+    data = pd.read_csv('../data/data.txt', delimiter='\t', header=None, names=header, index_col='ID')
     print(f'{data.isna().any().any() = }\n')
 
     # Bin radius.
     r = data[['x', 'y', 'z']].apply(np.square).sum(axis=1).apply(np.sqrt)
     print(f'{r.describe() = }\n')
-    # n_bins = 70  # For N = 50010
-    n_bins = 50  # For N = 1001
+    n_bins = 70  # For N = 50010
+    # n_bins = 50  # For N = 1001
     bin_edges = log_bins(r.min(), r.max() + 1, n_bins)  # Make upper limit a little bigger to include last particle.
     hist, bin_edges = np.histogram(r, bins=bin_edges)
 
