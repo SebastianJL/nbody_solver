@@ -8,8 +8,9 @@ from src_python.tree import OctTree
 
 def main():
     # Read file.
-    in_path = Path(f'../data/data_small_10.txt')
+    in_path = Path(f'../data/data_small_4168.txt')
     masses, positions, velocities = read_particles(in_path)
+    n = len(masses)
     oct_tree = OctTree(masses, positions, velocities)
 
     # Build tree.
@@ -38,29 +39,46 @@ def main():
     eps = 0
     eps2 = eps*2
 
-    # With tree ...
+    # With tree and monopole ...
     start = time.perf_counter()
-    accelerations_tree = oct_tree.calculate_accelerations(eps2)
-    acc_calc_tree_duration = time.perf_counter() - start
-    print(f'{acc_calc_tree_duration = :g}s')
+    accelerations_tree = oct_tree.calculate_accelerations(eps2, quadrupole=True)
+    acc_calc_tree_mono_duration = time.perf_counter() - start
+    print(f'{acc_calc_tree_mono_duration = :g}s')
 
-    out_path = Path(f'../output/acc_tree_py_n={len(masses)}_eps={eps}_.dat')
+    out_path = Path(f'../output/acc_tree_mono_py_n={n}_eps={eps}_.dat')
     start = time.perf_counter()
     write_particles(out_path, masses, positions, accelerations_tree)
     write_duration = time.perf_counter() - start
     print(f'{write_duration = :g}s')
 
-    # ... or direct
+    # ... plus quadrupole ...
     start = time.perf_counter()
-    accelerations_direct= calculate_accelerations_direct(masses, positions, eps2)
+    accelerations_tree = oct_tree.calculate_accelerations(eps2, quadrupole=True)
+    acc_calc_tree_quad_duration = time.perf_counter() - start
+    print(f'{acc_calc_tree_quad_duration = :g}s')
+
+    out_path = Path(f'../output/acc_tree_quad_py_n={n}_eps={eps}_.dat')
+    start = time.perf_counter()
+    write_particles(out_path, masses, positions, accelerations_tree)
+    write_duration = time.perf_counter() - start
+    print(f'{write_duration = :g}s')
+
+    # ... or just direct
+    start = time.perf_counter()
+    accelerations_direct = calculate_accelerations_direct(masses, positions, eps2)
     acc_calc_direct_duration = time.perf_counter() - start
     print(f'{acc_calc_direct_duration = :g}s')
 
-    out_path = Path(f'../output/acc_direct_py_n={len(masses)}_eps={eps}_.dat')
+    out_path = Path(f'../output/acc_direct_py_n={n}_eps={eps}_.dat')
     start = time.perf_counter()
-    write_particles(out_path, masses, positions, accelerations_tree)
+    write_particles(out_path, masses, positions, accelerations_direct)
     write_duration = time.perf_counter() - start
     print(f'{write_duration = :g}s')
+
+    with open(f'../output/timings_py_n={n}.txt', 'a') as ofile:
+        ofile.write(f'{acc_calc_tree_mono_duration = :g}s\n')
+        ofile.write(f'{acc_calc_tree_quad_duration = :g}s\n')
+        ofile.write(f'{acc_calc_direct_duration = :g}s\n')
 
 
 if __name__ == '__main__':
