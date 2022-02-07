@@ -9,7 +9,7 @@ if __name__ == '__main__':
     G = 1
     pc = 206265  # au
     M_solar = (4 * pi ** 2 / G)  # au**3 / yr**2
-    M_0 = 10e10 * M_solar
+    M_0 = 1e10 * M_solar
     L_0 = 1e3 * pc
     T_0 = sqrt(L_0 ** 3 / (M_0 * G))  # yr
     V_0 = L_0 / T_0  # au / yr
