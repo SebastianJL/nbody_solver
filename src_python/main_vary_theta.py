@@ -11,7 +11,7 @@ from src_python.tree import OctTree
 def main():
 
     # Read file.
-    in_path = Path(f'../data/data_small_10.txt')
+    in_path = Path(f'../data/data_small_1001.txt')
     with Timed('reading file'):
         masses, positions, velocities = read_particles(in_path)
         n = len(masses)
@@ -19,15 +19,16 @@ def main():
     eps = 0
     eps2 = eps*2
     theta_max_list = np.arange(0.1, 1.31, 0.1)
-    out_timings_path = f'../output/timings_py_{n=}_theta_max=[{theta_max_list[0]:.1f},{theta_max_list[-1]:.1f}]_.txt'
+    repetitions: int = 10
+    out_timings_path = f'../output/timings_py_{n=}_{eps=}_theta_max=[{theta_max_list[0]:.1f},{theta_max_list[-1]:.1f}]_.txt'
     with open(out_timings_path, 'w') as out_file:
-        out_file.write('theta_max, ')
-        out_file.write('mono, ')
-        out_file.write('quad, ')
+        out_file.write('theta_max,')
+        out_file.write('mono,')
+        out_file.write('quad,')
         out_file.write('direct\n')
 
     print()
-    for i in range(10):
+    for i in range(repetitions):
         print(f'{i = }')
         print()
         for theta_max in theta_max_list:
@@ -69,10 +70,10 @@ def main():
                 write_particles(out_path, masses, positions, accelerations_direct)
 
             with open(out_timings_path, 'a') as out_file:
-                out_file.write(f'{theta_max:.1f}, ')
-                out_file.write(f'{t_mono.duration}s, ')
-                out_file.write(f'{t_quad.duration}s, ')
-                out_file.write(f'{t_direct.duration}s\n')
+                out_file.write(f'{theta_max:.1f},')
+                out_file.write(f'{t_mono.duration},')
+                out_file.write(f'{t_quad.duration},')
+                out_file.write(f'{t_direct.duration}\n')
 
             print('')
 
