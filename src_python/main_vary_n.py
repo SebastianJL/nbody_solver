@@ -77,7 +77,6 @@ def main():
                 out_file.write(f'{t_direct.duration}\n')
 
             print('')
-        break
 
 
 if __name__ == '__main__':
