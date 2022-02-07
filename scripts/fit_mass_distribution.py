@@ -106,6 +106,21 @@ def main():
     r_mean = 4 / 3 * np.pi * R_hm / np.power(N_hm, 1 / 3)  # https://en.wikipedia.org/wiki/Mean_inter-particle_distance
     print(f'mean inter-particle separation {r_mean = }')
 
+    # Estimate relaxation time scale
+    masses = data['Masses']
+    M_hm = masses[r<R_hm].sum()
+    print(fr'{M_hm = }')
+    # M_hm = masses.sum() / 2
+    # print(fr'{M_hm}')
+    v_c = np.sqrt(M_hm/R_hm)  # circular velocity at the half mass radius.
+    t_cross = r.max() / v_c
+    N = len(r)
+    Lambda = (r.max()) / (r_mean)
+    t_relax = N / (8 * np.log(Lambda)) * t_cross
+    T_0 =  4.71475e+06  # yr See units.py.
+    print(f'{t_relax = }')
+    print(f'{t_relax*T_0 = :g}yr')
+
     # Plot.
     fig, ax = plt.subplots()
     midpoints = (bin_edges[1:] + bin_edges[:-1]) / 2
@@ -120,8 +135,8 @@ def main():
     ax.legend()
 
     # plt.show()
-    out_file = Path(f'../output/hernquist_mass_distribution_n={N}.png')
-    plt.savefig(out_file, dpi=300)
+    # out_file = Path(f'../output/hernquist_mass_distribution_n={N}.png')
+    # plt.savefig(out_file, dpi=300)
 
 
 if __name__ == '__main__':
