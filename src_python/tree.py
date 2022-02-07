@@ -36,7 +36,7 @@ class OctTreeNode:
 
         Returns:
             Quadrupole matrix Q where
-            Q_ij = sum_k m_k ( 3(r_k)[i] (r_k)[j] - delta_ij (r_k)^2 )
+            Q_ij = sum_k m_k ( 3*r_k[i] r_k[j] - delta_ij (r_k)^2 )
             where r_k = s - x_k
             and s = center of mass.
         """
@@ -50,7 +50,6 @@ class OctTreeNode:
                         Q[i, j] += 3 * m_k * r_k[i] * r_k[j]
                         if i == j:
                             Q[i, j] -= m_k * r_k.dot(r_k)
-
 
             self._quadrupole = Q
         return self._quadrupole
@@ -140,7 +139,7 @@ class OctTreeNode:
                 node.validate(leaf_counter)
 
     def calculate_acceleration(self, position: np.ndarray[(1, 3), np.float32], eps2: np.float32, quadrupole: bool) -> \
-    np.ndarray[(3,), np.float32]:
+            np.ndarray[(3,), np.float32]:
         """ Calculate the acceleration that the tree causes at `position`.
 
         G=1 is assumed.
@@ -188,7 +187,10 @@ class OctTreeNode:
             else:
                 # Compute accelerations for children.
                 acc = sum(
-                    node.calculate_acceleration(position, eps2, quadrupole) for node in self.nodes.flatten() if node is not None)
+                    node.calculate_acceleration(position, eps2, quadrupole)
+                    for node in self.nodes.flatten()
+                    if node is not None
+                )
 
         return acc
 
