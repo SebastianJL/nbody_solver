@@ -58,7 +58,7 @@ def main():
                 accelerations_tree = oct_tree.calculate_accelerations(eps2, theta_max, quadrupole=True)
 
             out_path = Path(f'../output/acc_tree_quad_py_n={n}_eps={eps}_{theta_max=:.1f}_.dat')
-            with Timed('writing monopole'):
+            with Timed('writing quadrupole'):
                 write_particles(out_path, masses, positions, accelerations_tree)
 
             # ... or just direct
