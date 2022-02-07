@@ -38,10 +38,11 @@ def main():
     # Calculate accelerations.
     eps = 0
     eps2 = eps*2
+    theta_max = 0.5
 
     # With tree and monopole ...
     start = time.perf_counter()
-    accelerations_tree = oct_tree.calculate_accelerations(eps2, quadrupole=False)
+    accelerations_tree = oct_tree.calculate_accelerations(eps2, theta_max, quadrupole=False)
     acc_calc_tree_mono_duration = time.perf_counter() - start
     print(f'{acc_calc_tree_mono_duration = :g}s')
 
@@ -53,7 +54,7 @@ def main():
 
     # ... plus quadrupole ...
     start = time.perf_counter()
-    accelerations_tree = oct_tree.calculate_accelerations(eps2, quadrupole=True)
+    accelerations_tree = oct_tree.calculate_accelerations(eps2, theta_max, quadrupole=True)
     acc_calc_tree_quad_duration = time.perf_counter() - start
     print(f'{acc_calc_tree_quad_duration = :g}s')
 

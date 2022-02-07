@@ -138,7 +138,8 @@ class OctTreeNode:
                 assert (self.max >= node.max).all()
                 node.validate(leaf_counter)
 
-    def calculate_acceleration(self, position: np.ndarray[(1, 3), np.float32], eps2: np.float32, quadrupole: bool) -> \
+    def calculate_acceleration(self, position: np.ndarray[(1, 3), np.float32], eps2: np.float32, theta_max: np.float32,
+                               quadrupole: bool) -> \
             np.ndarray[(3,), np.float32]:
         """ Calculate the acceleration that the tree causes at `position`.
 
@@ -154,8 +155,9 @@ class OctTreeNode:
             where Q is the quadrupole.
 
         Args:
-            eps2: Softening factor squared.
             position: Position at which acceleration is to be calculated.
+            eps2: Softening factor squared.
+            theta_max: Maximum opening angle.
             quadrupole: Calculate the Monopole + Quadrupole in non leaf tree nodes.
 
         Returns:
@@ -178,7 +180,7 @@ class OctTreeNode:
         else:
             y_abs = np.sqrt(y2)
             opening_angle = self.size / y_abs
-            if opening_angle < 1.8:
+            if opening_angle < theta_max:
                 M = self.monopole()
                 acc = M * y / y_abs ** 3
                 if quadrupole:
@@ -187,7 +189,7 @@ class OctTreeNode:
             else:
                 # Compute accelerations for children.
                 acc = sum(
-                    node.calculate_acceleration(position, eps2, quadrupole)
+                    node.calculate_acceleration(position, eps2, theta_max, quadrupole)
                     for node in self.nodes.flatten()
                     if node is not None
                 )
@@ -232,16 +234,17 @@ class OctTree:
         self.root.validate(leaf_counter)
         assert leaf_counter[0] == len(self.positions)
 
-    def calculate_accelerations(self, eps2, quadrupole=False) -> np.ndarray[('N', 3), np.float32]:
+    def calculate_accelerations(self, eps2, theta_max, quadrupole=False) -> np.ndarray[('N', 3), np.float32]:
         """Calculate all accelerations caused on self.positions.
 
         Args:
             eps2: Softening factor squared.
+            theta_max: Maximum opening angle.
             quadrupole: Calculate the Monopole + Quadrupole in non leaf tree nodes.
         """
         acc = np.zeros((self.root.n_particles, 3))
         for (i, pos) in enumerate(self.positions):
-            acc[i] = self.root.calculate_acceleration(pos, eps2, quadrupole)
+            acc[i] = self.root.calculate_acceleration(pos, eps2, theta_max, quadrupole)
         return acc
 
     def plot_2d(self, ax: Axes, dim1: int, dim2: int, level: int = -1):
