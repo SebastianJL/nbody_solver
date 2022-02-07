@@ -14,17 +14,6 @@ def read_binary(path: Path):
     return df
 
 
-def acc_hernquist(r, M, a):
-    """
-
-    Args:
-        r: radius.
-        M: total mass of the system.
-        a: scaling length according to hernquist model.
-    """
-    return M / (r + a) ** 2
-
-
 def main():
     n = 1001
     eps = 0
@@ -35,6 +24,7 @@ def main():
     R_hm = 0.18934428303908363  # Half mass radius. See fit_mass_distribution.py.
 
     kinds = ['direct_rs', 'tree_mono_py', 'tree_quad_py']
+    labels = ['monopole', 'quadrupole' ]
 
     fig = plt.figure()
     plt.axvline(R_hm, 0, 1, color='grey')
@@ -45,16 +35,14 @@ def main():
     ref_data = read_binary(in_file)
     ref_acc = ref_data[['ax', 'ay', 'az']].apply(np.square).sum(axis=1).apply(np.sqrt)
     print(f'{(ref_acc < 0).any()}')
-    for kind in kinds[1:]:
+    for kind, label in zip(kinds[1:], labels):
         in_file = Path(f'../output/acc_{kind}_n={n}_eps={eps}_theta_max={theta_max:.1f}_.dat')
         data = read_binary(in_file)
         assert (data.shape[0] == n)
 
         r = data[['x', 'y', 'z']].apply(np.square).sum(axis=1).apply(np.sqrt)
         acc = data[['ax', 'ay', 'az']].apply(np.square).sum(axis=1).apply(np.sqrt)
-        print(f'{(acc < 0).any()}')
-        print(f'{(acc/ref_acc < 0).any()}')
-        plt.semilogx(r, acc/ref_acc, '.', label=f'{kind}')
+        plt.semilogx(r, acc/ref_acc, '.', label=label)
 
     plt.title(f'{n = }, {theta_max = :.1f}')
     plt.xlabel('radius $[L_0]$')
