@@ -8,7 +8,7 @@ from src_python.tree import OctTree
 
 def main():
     # Read file.
-    in_path = Path(f'../data/data_small_4168.txt')
+    in_path = Path(f'../data/data_small_1001.txt')
     masses, positions, velocities = read_particles(in_path)
     n = len(masses)
     oct_tree = OctTree(masses, positions, velocities)
@@ -41,7 +41,7 @@ def main():
 
     # With tree and monopole ...
     start = time.perf_counter()
-    accelerations_tree = oct_tree.calculate_accelerations(eps2, quadrupole=True)
+    accelerations_tree = oct_tree.calculate_accelerations(eps2, quadrupole=False)
     acc_calc_tree_mono_duration = time.perf_counter() - start
     print(f'{acc_calc_tree_mono_duration = :g}s')
 

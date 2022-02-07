@@ -47,9 +47,10 @@ class OctTreeNode:
                 for j in range(3):
                     for (m_k, x_k) in zip(self.masses, self.positions):
                         r_k = s - x_k
-                        Q[i, j] += m_k * r_k[i] * r_k[j]
+                        Q[i, j] += 3 * m_k * r_k[i] * r_k[j]
                         if i == j:
-                            Q[i, j] -= r_k.dot(r_k)
+                            Q[i, j] -= m_k * r_k.dot(r_k)
+
 
             self._quadrupole = Q
         return self._quadrupole
@@ -59,7 +60,7 @@ class OctTreeNode:
         self.com = center_of_mass(self.masses, self.positions)
         self.n_particles = len(self.masses)
         self.is_leaf = (self.n_particles == 1)
-        self.size = np.sqrt(np.sum((self.max - self.min) ** 2)) / 2  # Radius of sphere enclosing the node box.
+        self.size = np.sqrt(np.sum((self.max - self.min) ** 2))  # Diameter of sphere enclosing the node box.
 
         if self.is_leaf:
             return
@@ -178,7 +179,7 @@ class OctTreeNode:
         else:
             y_abs = np.sqrt(y2)
             opening_angle = self.size / y_abs
-            if opening_angle < 0.9:
+            if opening_angle < 1.8:
                 M = self.monopole()
                 acc = M * y / y_abs ** 3
                 if quadrupole:
