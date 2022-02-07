@@ -10,19 +10,14 @@ from src_python.tree import OctTree
 
 def main():
 
-    # Read file.
-    in_path = Path(f'../data/data_small_1001.txt')
-    with Timed('reading file'):
-        masses, positions, velocities = read_particles(in_path)
-        n = len(masses)
-
+    n_list = [10, 101, 2001, 3126, 4168] #, 10_002]
+    # n_list = [4168]
     eps = 0
     eps2 = eps*2
-    theta_max_list = np.arange(0.1, 1.31, 0.1)
     repetitions: int = 10
-    out_timings_path = f'../output/timings_py_{n=}_{eps=}_theta_max=[{theta_max_list[0]:.1f},{theta_max_list[-1]:.1f}]_.txt'
+    out_timings_path = f'../output/timings_py_n=[{n_list[0]}, {n_list[-1]}]_{eps=}_theta_max=0.5+0.9_.txt'
     with open(out_timings_path, 'w') as out_file:
-        out_file.write('theta_max,')
+        out_file.write('n,')
         out_file.write('mono,')
         out_file.write('quad,')
         out_file.write('direct\n')
@@ -31,8 +26,14 @@ def main():
     for i in range(repetitions):
         print(f'{i = }')
         print()
-        for theta_max in theta_max_list:
-            print(f'{theta_max = }')
+        for n in n_list:
+            print(f'{n = }')
+
+            # Read file.
+            in_path = Path(f'../data/data_small_{n}.txt')
+            with Timed('reading file'):
+                masses, positions, velocities = read_particles(in_path)
+                assert(n == len(masses))
 
             # Build tree.
             with Timed('building tree'):
@@ -47,17 +48,17 @@ def main():
             # Calculate accelerations.
             # With tree and monopole ...
             with Timed('calculating monopole') as t_mono:
-                accelerations_tree = oct_tree.calculate_accelerations(eps2, theta_max, quadrupole=False)
+                accelerations_tree = oct_tree.calculate_accelerations(eps2, theta_max=0.5, quadrupole=False)
 
-            out_path = Path(f'../output/acc_tree_mono_py_n={n}_eps={eps}_{theta_max=:.1f}_.dat')
+            out_path = Path(f'../output/acc_tree_mono_py_n={n}_eps={eps}_theta_max={0.5:.1f}_.dat')
             with Timed('writing monopole'):
                 write_particles(out_path, masses, positions, accelerations_tree)
 
             # ... plus quadrupole ...
             with Timed('calculating quadrupole') as t_quad:
-                accelerations_tree = oct_tree.calculate_accelerations(eps2, theta_max, quadrupole=True)
+                accelerations_tree = oct_tree.calculate_accelerations(eps2, theta_max=0.9, quadrupole=True)
 
-            out_path = Path(f'../output/acc_tree_quad_py_n={n}_eps={eps}_{theta_max=:.1f}_.dat')
+            out_path = Path(f'../output/acc_tree_quad_py_n={n}_eps={eps}_theta_max={0.9:.1f}_.dat')
             with Timed('writing monopole'):
                 write_particles(out_path, masses, positions, accelerations_tree)
 
@@ -70,12 +71,13 @@ def main():
                 write_particles(out_path, masses, positions, accelerations_direct)
 
             with open(out_timings_path, 'a') as out_file:
-                out_file.write(f'{theta_max:.1f},')
+                out_file.write(f'{n},')
                 out_file.write(f'{t_mono.duration},')
                 out_file.write(f'{t_quad.duration},')
                 out_file.write(f'{t_direct.duration}\n')
 
             print('')
+        break
 
 
 if __name__ == '__main__':
