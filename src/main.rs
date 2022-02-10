@@ -4,12 +4,7 @@ extern crate log;
 use std::fs::OpenOptions;
 use std::path::Path;
 
-mod io;
-mod math;
-mod particle;
-mod vector3d;
-
-type Real = f32;
+use n_body_project::{io, math, Real};
 
 fn setup_logging() {
     use simplelog::*;
@@ -50,19 +45,18 @@ fn main() {
     info!("reading {:?}", dt0);
 
     // Calculate forces.
-    // Write data.
     let t1 = std::time::Instant::now();
     math::calculate_accelerations_direct(&mut particles, eps2);
+    let dt1 = t1.elapsed();
     info!("acceleration calculation {:?}", dt1);
 
+    // Write data.
     let out_file = format!(
         "./output/acc_direct_rs_n={}_eps={}_.dat",
         particles.len(),
         eps
     );
     let t2 = std::time::Instant::now();
-
-    let dt1 = t1.elapsed();
     io::write_particles(out_file, &particles).expect("Error writing file.");
     let dt2 = t2.elapsed();
     info!("writing {:?}", dt2);
