@@ -1,5 +1,9 @@
 # N body project
 
+This project was originally done for the course "Computational Astrophysics".
+If you want the version of the project at the point in time the presentation was held
+checkout the commit 954b5f6f92d57f208fceffca1a3bb8d4922d586d.
+
 ## Data format
 - data.txt
   - No header
