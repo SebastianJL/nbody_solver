@@ -2,6 +2,7 @@ project_documentation
 .idea
 output
 figures
+run.log
 
 # Added by cargo
 
