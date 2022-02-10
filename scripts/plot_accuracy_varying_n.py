@@ -52,11 +52,11 @@ def main():
         delta_acc_err_quad.append(a_rel_error_quad)
 
     plt.axhline(delta_acc_mono[4], ls='--', color='black', alpha=0.5)
-    plt.errorbar(n_list, delta_acc_mono, yerr=delta_acc_err_mono, capsize=2, fmt='.', label='monopole')
-    plt.errorbar(n_list, delta_acc_quad, yerr=delta_acc_err_quad, capsize=2, fmt='.', label='quadrupole')
-    plt.xlabel(r'$\theta_{max}$ [rad]')
+    plt.errorbar(n_list, delta_acc_mono, yerr=delta_acc_err_mono, capsize=2, fmt='.', label=r'monopole, $\theta_{max} = 0.5$')
+    plt.errorbar(n_list, delta_acc_quad, yerr=delta_acc_err_quad, capsize=2, fmt='.', label=r'quadrupole, $\theta_{max} = 0.9$')
+    plt.xlabel(r'N')
     plt.ylabel(r'$\Delta a / a$')
-    plt.title(f'{n = }, $\\epsilon = {eps}$')
+    plt.title(f'$\\epsilon = {eps}$')
 
     plt.legend()
 
