@@ -4,6 +4,8 @@ extern crate log;
 use std::fs::OpenOptions;
 use std::path::Path;
 
+use n_body_project::tree::OctTreeNode;
+use n_body_project::vector3d::Vector3D;
 use n_body_project::{io, math, Real};
 
 fn setup_logging() {
@@ -44,20 +46,27 @@ fn main() {
     let dt0 = t0.elapsed();
     info!("reading {:?}", dt0);
 
-    // Calculate forces.
-    let t1 = std::time::Instant::now();
-    math::calculate_accelerations_direct(&mut particles, eps2);
-    let dt1 = t1.elapsed();
-    info!("acceleration calculation {:?}", dt1);
+    // // Calculate forces with direct summation.
+    // let t1 = std::time::Instant::now();
+    // math::calculate_accelerations_direct(&mut particles, eps2);
+    // let dt1 = t1.elapsed();
+    // info!("direct summation acceleration calculation {:?}", dt1);
+    //
+    // // Write data.
+    // let out_file = format!(
+    //     "./output/acc_direct_rs_n={}_eps={}_.dat",
+    //     particles.len(),
+    //     eps
+    // );
+    // let t2 = std::time::Instant::now();
+    // io::write_particles(out_file, &particles).expect("Error writing file.");
+    // let dt2 = t2.elapsed();
+    // info!("writing {:?}", dt2);
 
-    // Write data.
-    let out_file = format!(
-        "./output/acc_direct_rs_n={}_eps={}_.dat",
-        particles.len(),
-        eps
-    );
-    let t2 = std::time::Instant::now();
-    io::write_particles(out_file, &particles).expect("Error writing file.");
-    let dt2 = t2.elapsed();
-    info!("writing {:?}", dt2);
+    // Calculate forces with direct summation.
+    let t1 = std::time::Instant::now();
+    let zero = Vector3D::zero();
+    let oct_tree = OctTreeNode::build(&particles.iter().collect(), zero.clone(), zero);
+    let dt1 = t1.elapsed();
+    info!("tree build {:?}", dt1);
 }
